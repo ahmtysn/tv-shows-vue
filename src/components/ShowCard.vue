@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="show-card">
+  <RouterLink :to="{ name: 'show-detail', params: { id: show.id } }" class="show-card">
     <img
       v-if="show.image"
       :src="show.image.medium"
@@ -21,7 +21,7 @@ defineProps<{
         ⭐ {{ show.rating.average }}
       </span>
     </div>
-  </div>
+  </RouterLink>
 </template>
 
 <style scoped>
@@ -29,6 +29,8 @@ defineProps<{
   width: 160px;
   flex-shrink: 0;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 }
 
 .show-card__image {
