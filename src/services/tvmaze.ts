@@ -1,4 +1,4 @@
-import type { Show, SearchResult } from '@/types/show'
+import type { Show, ShowWithCast, SearchResult } from '@/types/show'
 
 const BASE_URL = 'https://api.tvmaze.com'
 
@@ -12,8 +12,8 @@ export async function fetchShows(page = 0): Promise<Show[]> {
   return response.json()
 }
 
-export async function fetchShowById(id: number): Promise<Show> {
-  const response = await fetch(`${BASE_URL}/shows/${id}`)
+export async function fetchShowById(id: number): Promise<ShowWithCast> {
+  const response = await fetch(`${BASE_URL}/shows/${id}?embed=cast`)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch show ${id}: ${response.status}`)

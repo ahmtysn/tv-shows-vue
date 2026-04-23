@@ -41,6 +41,28 @@ export interface Schedule {
   days: string[]
 }
 
+export interface CastMember {
+  person: Person
+  character: Character
+}
+
+export interface Person {
+  id: number
+  name: string
+  image: Image | null
+}
+
+export interface Character {
+  id: number
+  name: string
+}
+
+export interface ShowWithCast extends Show {
+  _embedded?: {
+    cast: CastMember[]
+  }
+}
+
 export interface SearchResult {
   score: number
   show: Show

@@ -3,7 +3,7 @@ import { onMounted } from 'vue'
 import { useShowsStore } from '@/stores/shows'
 import { useSearchStore } from '@/stores/search'
 import ShowCard from '@/components/ShowCard.vue'
-import SearchBar from '@/components/SearchBar.vue'
+import GenreRow from '@/components/GenreRow.vue'
 
 const store = useShowsStore()
 const searchStore = useSearchStore()
@@ -15,8 +15,6 @@ onMounted(() => {
 
 <template>
   <div>
-    <SearchBar />
-
     <!-- Search results -->
     <template v-if="searchStore.query">
       <p v-if="searchStore.isLoading" class="status">Searching...</p>
@@ -41,13 +39,13 @@ onMounted(() => {
       <template v-else>
         <section v-for="genre in store.genres" :key="genre" class="genre-section">
           <h2 class="section-title">{{ genre }}</h2>
-          <div class="genre-row">
+          <GenreRow>
             <ShowCard
               v-for="show in store.showsByGenre[genre]"
               :key="show.id"
               :show="show"
             />
-          </div>
+          </GenreRow>
         </section>
       </template>
     </template>
@@ -57,28 +55,24 @@ onMounted(() => {
 <style scoped>
 .status {
   text-align: center;
-  color: #666;
+  color: #888;
   padding: 2rem 0;
 }
 
 .status--error {
-  color: #c0392b;
+  color: #e74c3c;
 }
 
 .section-title {
   font-size: 1.3rem;
   margin-bottom: 0.75rem;
+  color: #eee;
 }
 
 .genre-section {
-  margin-bottom: 1.5rem;
-}
-
-.genre-row {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .search-results {

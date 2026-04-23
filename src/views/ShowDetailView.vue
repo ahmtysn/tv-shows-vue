@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { Show } from '@/types/show'
+import type { ShowWithCast } from '@/types/show'
 import { fetchShowById } from '@/services/tvmaze'
 
 const route = useRoute()
 const router = useRouter()
 
-// loading state management
-const show = ref<Show | null>(null)
+const show = ref<ShowWithCast | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+const cast = computed(() => show.value?._embedded?.cast ?? [])
 
 onMounted(async () => {
   const id = Number(route.params.id)
@@ -30,8 +31,8 @@ function goBack() {
 </script>
 
 <template>
-  <div>
-    <button class="back-btn" @click="goBack">&larr; Back</button>
+  <div class="page">
+    <button class="back-btn" @click="goBack">&#8592; Back</button>
 
     <p v-if="isLoading" class="status">Loading...</p>
     <p v-else-if="error" class="status">{{ error }}</p>
@@ -46,35 +47,35 @@ function goBack() {
         />
 
         <div class="detail__content">
-          <h1>{{ show.name }}</h1>
+          <h1 class="detail__title">{{ show.name }}</h1>
 
-          <div class="detail__meta">
-            <span v-if="show.rating.average">⭐ {{ show.rating.average }}</span>
-            <span v-if="show.genres.length">{{ show.genres.join(', ') }}</span>
-            <span v-if="show.language">{{ show.language }}</span>
-            <span v-if="show.status">{{ show.status }}</span>
+          <div class="detail__tags">
+            <span v-if="show.rating.average" class="tag tag--rating">★ {{ show.rating.average }}</span>
+            <span v-if="show.status" class="tag">{{ show.status }}</span>
+            <span v-if="show.premiered" class="tag">{{ show.premiered.slice(0, 4) }}</span>
+            <span v-if="show.runtime" class="tag">{{ show.runtime }} min</span>
+            <span v-if="show.language" class="tag">{{ show.language }}</span>
+          </div>
+
+          <div v-if="show.genres.length" class="detail__genres">
+            <span v-for="genre in show.genres" :key="genre" class="genre-chip">{{ genre }}</span>
           </div>
 
           <div v-if="show.summary" class="detail__summary" v-html="show.summary" />
 
-          <dl class="detail__info">
+          <div class="detail__info">
             <template v-if="show.network">
-              <dt>Network</dt>
-              <dd>{{ show.network.name }}</dd>
-            </template>
-            <template v-if="show.premiered">
-              <dt>Premiered</dt>
-              <dd>{{ show.premiered }}</dd>
+              <span class="info-label">Network</span>
+              <span class="info-value">
+                {{ show.network.name }}
+                <template v-if="show.network.country"> · {{ show.network.country.name }}</template>
+              </span>
             </template>
             <template v-if="show.schedule.days.length">
-              <dt>Schedule</dt>
-              <dd>{{ show.schedule.days.join(', ') }} at {{ show.schedule.time || 'TBA' }}</dd>
+              <span class="info-label">Schedule</span>
+              <span class="info-value">{{ show.schedule.days.join(', ') }} at {{ show.schedule.time || 'TBA' }}</span>
             </template>
-            <template v-if="show.runtime">
-              <dt>Runtime</dt>
-              <dd>{{ show.runtime }} min</dd>
-            </template>
-          </dl>
+          </div>
 
           <a
             v-if="show.officialSite"
@@ -83,96 +84,225 @@ function goBack() {
             rel="noopener"
             class="detail__link"
           >
-            Visit official site &rarr;
+            Official Site &#8594;
           </a>
         </div>
       </div>
+
+      <section v-if="cast.length" class="cast">
+        <h2 class="cast__title">Cast</h2>
+        <div class="cast__grid">
+          <div v-for="member in cast" :key="member.person.id" class="cast-card">
+            <img
+              v-if="member.person.image"
+              :src="member.person.image.medium"
+              :alt="member.person.name"
+              class="cast-card__image"
+            />
+            <div v-else class="cast-card__placeholder">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+              </svg>
+            </div>
+            <p class="cast-card__name">{{ member.person.name }}</p>
+            <p class="cast-card__character">{{ member.character.name }}</p>
+          </div>
+        </div>
+      </section>
     </template>
   </div>
 </template>
 
 <style scoped>
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
 .back-btn {
   background: none;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0.4rem 1rem;
+  border: none;
+  padding: 0;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background 0.2s;
+  font-weight: 900;
+  color: #ffc107;
+  transition: opacity 0.2s;
 }
 
 .back-btn:hover {
-  background: #eee;
+  opacity: 0.75;
 }
 
 .status {
   text-align: center;
-  color: #666;
+  color: #888;
   padding: 2rem 0;
 }
 
 .detail {
   display: flex;
   gap: 2rem;
-  margin-top: 1.5rem;
+  margin-top: 1.25rem;
 }
 
 .detail__image {
-  width: 300px;
-  border-radius: 8px;
+  width: 320px;
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  align-self: flex-start;
 }
 
 .detail__content {
   flex: 1;
+  min-width: 0;
 }
 
-.detail__content h1 {
+.detail__title {
   font-size: 2rem;
-  margin-bottom: 0.25rem;
+  color: #fff;
+  margin-bottom: 0.6rem;
 }
 
-.detail__meta {
+.detail__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  color: #666;
-  margin: 0.5rem 0 1.5rem;
+  gap: 0.4rem;
+  margin-bottom: 0.6rem;
+}
+
+.tag {
+  background: #2a2a3e;
+  color: #ccc;
+  font-size: 0.82rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 6px;
+}
+
+.tag--rating {
+  background: #ffc107;
+  color: #000;
+  border-color: #ffc107;
+  font-weight: 700;
+}
+
+.detail__genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.genre-chip {
+  background: #1e3a5f;
+  color: #7fc8f8;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 16px;
+  font-weight: 600;
 }
 
 .detail__summary {
   line-height: 1.7;
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin-bottom: 1.25rem;
+  color: #bbb;
 }
 
 .detail__info {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.5rem 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.35rem 1rem;
+  margin-bottom: 1.25rem;
 }
 
-.detail__info dt {
-  font-weight: 600;
-  color: #555;
+.info-label {
+  font-weight: 700;
+  color: #e0e0e0;
+  font-size: 0.9rem;
 }
 
-.detail__info dd {
-  margin: 0;
+.info-value {
+  color: #ccc;
+  font-size: 0.9rem;
 }
 
 .detail__link {
   display: inline-block;
-  color: #2563eb;
-  font-weight: 500;
+  color: #ffc107;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .detail__link:hover {
   text-decoration: underline;
+}
+
+/* Cast section */
+.cast {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cast__title {
+  font-size: 1.3rem;
+  color: #eee;
+  margin-bottom: 1rem;
+}
+
+.cast__grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.cast-card {
+  width: 90px;
+  text-align: center;
+}
+
+.cast-card__image {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 0.4rem;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.cast-card__placeholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #2a2a42;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.4rem;
+  color: #555;
+}
+
+.cast-card__placeholder svg {
+  width: 28px;
+  height: 28px;
+}
+
+.cast-card__name {
+  font-size: 0.75rem;
+  color: #ddd;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.cast-card__character {
+  font-size: 0.7rem;
+  color: #888;
+  line-height: 1.2;
+  margin-top: 0.15rem;
 }
 
 @media (max-width: 640px) {
@@ -182,7 +312,7 @@ function goBack() {
 
   .detail__image {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
   }
 }
 </style>
