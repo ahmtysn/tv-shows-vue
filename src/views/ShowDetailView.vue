@@ -13,6 +13,9 @@ const error = ref<string | null>(null)
 
 const cast = computed(() => show.value?._embedded?.cast ?? [])
 
+const SKELETON_TAG_COUNT = 5
+const SKELETON_TEXT_LINES = 4
+
 onMounted(async () => {
   const id = Number(route.params.id)
 
@@ -34,7 +37,16 @@ function goBack() {
   <div class="page">
     <button class="back-btn" @click="goBack">&#8592; Back</button>
 
-    <p v-if="isLoading" class="status">Loading...</p>
+    <div v-if="isLoading" class="detail-skeleton">
+      <div class="detail-skeleton__image shimmer" />
+      <div class="detail-skeleton__content">
+        <div class="detail-skeleton__title shimmer" />
+        <div class="detail-skeleton__row">
+          <div v-for="n in SKELETON_TAG_COUNT" :key="n" class="detail-skeleton__tag shimmer" />
+        </div>
+        <div v-for="n in SKELETON_TEXT_LINES" :key="n" class="detail-skeleton__line shimmer" />
+      </div>
+    </div>
     <p v-else-if="error" class="status">{{ error }}</p>
 
     <template v-else-if="show">
@@ -305,12 +317,78 @@ function goBack() {
   margin-top: 0.15rem;
 }
 
+/* Detail skeleton */
+.detail-skeleton {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.25rem;
+}
+
+.detail-skeleton__image {
+  width: 320px;
+  aspect-ratio: 2 / 3;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: #2a2a42;
+}
+
+.detail-skeleton__content {
+  flex: 1;
+  padding-top: 0.5rem;
+}
+
+.detail-skeleton__title {
+  height: 28px;
+  width: 50%;
+  border-radius: 4px;
+}
+
+.detail-skeleton__row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.detail-skeleton__tag {
+  height: 22px;
+  width: 60px;
+  border-radius: 4px;
+}
+
+.detail-skeleton__line {
+  height: 14px;
+  width: 100%;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+.detail-skeleton__line:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #2a2a42 25%, #35355a 50%, #2a2a42 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 @media (max-width: 640px) {
-  .detail {
+  .detail,
+  .detail-skeleton {
     flex-direction: column;
   }
 
-  .detail__image {
+  .detail__image,
+  .detail-skeleton__image {
     width: 100%;
     max-width: 320px;
   }

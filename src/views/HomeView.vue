@@ -4,6 +4,10 @@ import { useShowsStore } from '@/stores/shows'
 import { useSearchStore } from '@/stores/search'
 import ShowCard from '@/components/ShowCard.vue'
 import GenreRow from '@/components/GenreRow.vue'
+import SkeletonCard from '@/components/SkeletonCard.vue'
+
+const SKELETON_ROWS = 4
+const SKELETON_CARDS_PER_ROW = 8
 
 const store = useShowsStore()
 const searchStore = useSearchStore()
@@ -33,7 +37,14 @@ onMounted(() => {
 
     <!-- Genre dashboard -->
     <template v-else>
-      <p v-if="store.isLoading" class="status">Loading shows...</p>
+      <template v-if="store.isLoading">
+        <section v-for="n in SKELETON_ROWS" :key="n" class="genre-section">
+          <div class="skeleton-title shimmer" />
+          <GenreRow>
+            <SkeletonCard v-for="i in SKELETON_CARDS_PER_ROW" :key="i" />
+          </GenreRow>
+        </section>
+      </template>
       <p v-else-if="store.error" class="status status--error">{{ store.error }}</p>
 
       <template v-else>
@@ -79,5 +90,28 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+}
+
+.skeleton-title {
+  height: 20px;
+  width: 140px;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  background: #2a2a42;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #2a2a42 25%, #35355a 50%, #2a2a42 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 </style>
