@@ -58,7 +58,17 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .app-header__inner {
+    flex-wrap: wrap;
+  }
+
+  .app-header__title {
+    font-size: 1rem;
+  }
 }
 
 .app-header__brand {

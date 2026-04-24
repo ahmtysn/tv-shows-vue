@@ -40,4 +40,10 @@
     background-position: -200% 0;
   }
 }
+
+@media (max-width: 480px) {
+  .skeleton-card {
+    width: 140px;
+  }
+}
 </style>

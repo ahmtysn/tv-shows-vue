@@ -89,4 +89,14 @@ defineProps<{
   white-space: nowrap;
   color: #ddd;
 }
+
+@media (max-width: 480px) {
+  .show-card {
+    width: 140px;
+  }
+
+  .show-card__title {
+    font-size: 0.8rem;
+  }
+}
 </style>
