@@ -1,54 +1,63 @@
-# tv-shows
+# TV ShowHub
 
-This template should help get you started developing with Vue 3 in Vite.
+A TV show dashboard built with Vue 3 that displays shows grouped by genre, sorted by rating, with detail pages and search — powered by the [TVMaze API](https://www.tvmaze.com/api).
 
-## Recommended IDE Setup
+## Quick Start
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+```bash
+node -v   # requires ^20.19.0 || >=22.12.0  (developed on 22.22.2)
+npm -v    # 10.9.7
 
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
 npm install
+npm run dev       # http://localhost:5173
+npm run test:unit # vitest
+npm run build     # production build
 ```
 
-### Compile and Hot-Reload for Development
+## Tech Stack
 
-```sh
-npm run dev
+| Layer | Choice |
+|---|---|
+| Framework | Vue 3 (Composition API, `<script setup>`) |
+| State | Pinia |
+| Routing | Vue Router (`/`, `/search?q=`, `/show/:id`) |
+| Build | Vite |
+| Language | TypeScript |
+| Tests | Vitest + Vue Test Utils |
+| Styling | Scoped CSS + CSS custom properties (design tokens) |
+
+## Architecture Decisions
+
+**Pinia over composable-only state** — Pinia provides devtools integration, HMR support, and a standardized store pattern. For an app with shared state across routes (shows, search), a proper store is more maintainable than passing refs around.
+
+**`useAsyncData` composable** — Loading, error, and data states follow the same pattern everywhere. A generic composable with TypeScript overloads removes boilerplate from stores and views while keeping each consumer explicit about what it fetches.
+
+**CSS design tokens over a CSS framework** — Assignment asks to minimize scaffolding/boilerplate. Custom properties in `tokens.css` give consistent theming (dark/light) and spacing without a library dependency. Trade-off: more manual work, but full control and zero bundle cost.
+
+**Separate `SearchResultsView` with URL sync** — Search lives on `/search?q=term` so results are shareable and browser back/forward works naturally. The search store remains the single source of truth; the router only mirrors the query parameter.
+
+**`?embed=cast` over separate cast endpoint** — TVMaze supports embedding related resources in a single request. One HTTP round-trip instead of two means simpler loading states and no race conditions.
+
+**Defensive rendering** — All API data access uses optional chaining (`rating?.average`, `schedule?.days`). The show summary is sanitized before `v-html` rendering. Invalid route params are caught by regex constraints (`:id(\\d+)`) and a 404 catch-all.
+
+## Trade-offs
+
+- **No SSR / SSG** — A client-side SPA is sufficient for this scope. Server rendering would improve SEO and initial load but adds deployment complexity.
+- **No pagination** — The TVMaze show index returns 250 shows per page. We load page 0 only. Infinite scroll or pagination would be needed for a full catalog.
+- **No response caching** — API responses are fetched fresh on each navigation. A caching layer (service worker, HTTP cache headers, or in-memory TTL) would reduce redundant requests in production.
+- **Scoped CSS over CSS Modules** — Scoped CSS is simpler and Vue-idiomatic. CSS Modules would give stricter isolation but add verbosity for minimal benefit at this scale.
+
+## Project Structure
+
 ```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+src/
+├── assets/          # tokens.css (design tokens, theming)
+├── components/      # Reusable UI (ShowCard, GenreRow, SearchBar, ErrorBox, ...)
+├── composables/     # Shared logic (useAsyncData, useDebounce, useTheme)
+├── router/          # Route definitions
+├── services/        # API layer (tvmaze.ts)
+├── stores/          # Pinia stores (shows, search)
+├── types/           # TypeScript interfaces
+└── views/           # Route-level pages (Home, Search, ShowDetail, NotFound)
+tests/               # Unit tests mirroring src/ structure
 ```

@@ -25,9 +25,12 @@ watch(debouncedInput, (value) => {
 })
 
 watch(
-  () => searchStore.query,
-  (q) => {
-    if (input.value !== q) input.value = q
+  () => route.name,
+  (name) => {
+    if (name !== 'search' && input.value) {
+      input.value = ''
+      searchStore.clear()
+    }
   },
 )
 
