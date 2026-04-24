@@ -17,7 +17,12 @@ const SKELETON_TAG_COUNT = 5
 const SKELETON_TEXT_LINES = 4
 
 function loadShow() {
-  return execute(Number(route.params.id))
+  const id = Number(route.params.id)
+  if (!Number.isFinite(id) || id <= 0) {
+    router.replace({ name: 'not-found' })
+    return
+  }
+  return execute(id)
 }
 
 onMounted(loadShow)
@@ -29,9 +34,16 @@ function goBack() {
 
 <template>
   <div class="page">
-    <button class="back-btn" aria-label="Go back to previous page" @click="goBack">&#8592; Back</button>
+    <button class="back-btn" aria-label="Go back to previous page" @click="goBack">
+      &#8592; Back
+    </button>
 
-    <div v-if="isLoading" class="detail-skeleton" aria-busy="true" aria-label="Loading show details">
+    <div
+      v-if="isLoading"
+      class="detail-skeleton"
+      aria-busy="true"
+      aria-label="Loading show details"
+    >
       <div class="detail-skeleton__image shimmer" />
       <div class="detail-skeleton__content">
         <div class="detail-skeleton__title shimmer" />
@@ -45,31 +57,29 @@ function goBack() {
 
     <template v-else-if="show">
       <div class="detail">
-        <img
-          v-if="show.image"
-          :src="show.image.original"
-          :alt="show.name"
-          class="detail__image"
-        />
+        <img v-if="show.image" :src="show.image.original" :alt="show.name" class="detail__image" />
 
         <div class="detail__content">
           <h1 class="detail__title">{{ show.name }}</h1>
 
           <div class="detail__tags">
-            <span v-if="show.rating.average" class="tag tag--rating">★ {{ show.rating.average }}</span>
+            <span v-if="show.rating?.average" class="tag tag--rating"
+              >★ {{ show.rating.average }}</span
+            >
             <span v-if="show.status" class="tag">{{ show.status }}</span>
             <span v-if="show.premiered" class="tag">{{ show.premiered.slice(0, 4) }}</span>
             <span v-if="show.runtime" class="tag">{{ show.runtime }} min</span>
             <span v-if="show.language" class="tag">{{ show.language }}</span>
           </div>
 
-          <div v-if="show.genres.length" class="detail__genres">
+          <div v-if="show.genres?.length" class="detail__genres">
             <span v-for="genre in show.genres" :key="genre" class="genre-chip">{{ genre }}</span>
           </div>
 
+          <div v-if="sanitizedSummary" class="detail__summary" v-html="sanitizedSummary" />
           <div v-if="show.summary" class="detail__summary" v-html="show.summary" />
 
-          <div class="detail__info">
+          <div v-if="show.network || show.schedule?.days?.length" class="detail__info">
             <template v-if="show.network">
               <span class="info-label">Network</span>
               <span class="info-value">
@@ -77,9 +87,11 @@ function goBack() {
                 <template v-if="show.network.country"> · {{ show.network.country.name }}</template>
               </span>
             </template>
-            <template v-if="show.schedule.days.length">
+            <template v-if="show.schedule?.days?.length">
               <span class="info-label">Schedule</span>
-              <span class="info-value">{{ show.schedule.days.join(', ') }} at {{ show.schedule.time || 'TBA' }}</span>
+              <span class="info-value"
+                >{{ show.schedule.days.join(', ') }} at {{ show.schedule.time || 'TBA' }}</span
+              >
             </template>
           </div>
 

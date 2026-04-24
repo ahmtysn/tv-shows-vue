@@ -22,14 +22,10 @@ onMounted(() => {
       :message="searchStore.error"
       @retry="searchStore.search(searchStore.query)"
     />
-    <template v-else>
+    <template v-else-if="searchStore.query">
       <h2 class="section-title">Results for "{{ searchStore.query }}"</h2>
       <div class="search-results">
-        <ShowCard
-          v-for="show in searchStore.results"
-          :key="show.id"
-          :show="show"
-        />
+        <ShowCard v-for="show in searchStore.results" :key="show.id" :show="show" />
       </div>
       <p v-if="!searchStore.results.length" class="status">No shows found.</p>
     </template>

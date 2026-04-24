@@ -37,7 +37,13 @@ onUnmounted(() => {
       @click="scroll('left')"
       aria-label="Scroll left"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
         <path d="M15 18l-6-6 6-6" />
       </svg>
     </button>
@@ -52,7 +58,13 @@ onUnmounted(() => {
       @click="scroll('right')"
       aria-label="Scroll right"
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+      >
         <path d="M9 18l6-6-6-6" />
       </svg>
     </button>
@@ -91,7 +103,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-base), color var(--transition-base);
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
 }
 
 .scroll-btn:hover {

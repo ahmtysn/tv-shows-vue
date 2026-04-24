@@ -26,21 +26,13 @@ onMounted(() => {
         </GenreRow>
       </section>
     </template>
-    <ErrorBox
-      v-else-if="store.error"
-      :message="store.error"
-      @retry="store.loadShows()"
-    />
+    <ErrorBox v-else-if="store.error" :message="store.error" @retry="store.loadShows()" />
 
     <template v-else>
       <section v-for="genre in store.genres" :key="genre" class="genre-section">
         <h2 class="section-title">{{ genre }}</h2>
         <GenreRow>
-          <ShowCard
-            v-for="show in store.showsByGenre[genre]"
-            :key="show.id"
-            :show="show"
-          />
+          <ShowCard v-for="show in store.showsByGenre[genre]" :key="show.id" :show="show" />
         </GenreRow>
       </section>
     </template>

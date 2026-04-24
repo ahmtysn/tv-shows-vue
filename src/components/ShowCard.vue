@@ -10,7 +10,8 @@ defineProps<{
   <RouterLink
     :to="{ name: 'show-detail', params: { id: show.id } }"
     class="show-card"
-    :aria-label="`${show.name}${show.rating.average ? `, rated ${show.rating.average}` : ''}`"
+    role="listitem"
+    :aria-label="`${show.name}${show.rating?.average ? `, rated ${show.rating.average}` : ''}`"
   >
     <div class="show-card__poster">
       <img
@@ -21,7 +22,7 @@ defineProps<{
         loading="lazy"
       />
       <div v-else class="show-card__placeholder" aria-hidden="true">No Image</div>
-      <span v-if="show.rating.average" class="show-card__badge" aria-hidden="true">
+      <span v-if="show.rating?.average" class="show-card__badge" aria-hidden="true">
         ★ {{ show.rating.average }}
       </span>
     </div>

@@ -5,10 +5,12 @@ import { fetchShows } from '@/services/tvmaze'
 import { useAsyncData } from '@/composables/useAsyncData'
 
 export const useShowsStore = defineStore('shows', () => {
-  const { data: shows, isLoading, error, execute: loadShows } = useAsyncData(
-    fetchShows,
-    [] as Show[],
-  )
+  const {
+    data: shows,
+    isLoading,
+    error,
+    execute: loadShows,
+  } = useAsyncData(fetchShows, [] as Show[])
 
   const showsByGenre = computed(() => {
     const grouped: Record<string, Show[]> = {}
@@ -21,7 +23,7 @@ export const useShowsStore = defineStore('shows', () => {
     }
 
     for (const list of Object.values(grouped)) {
-      list?.sort((a, b) => (b.rating.average ?? 0) - (a.rating.average ?? 0))
+      list?.sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
     }
 
     return grouped

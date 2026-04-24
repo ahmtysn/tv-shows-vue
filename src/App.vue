@@ -26,7 +26,9 @@ body {
   color: var(--color-text-primary);
   background: var(--color-surface);
   -webkit-font-smoothing: antialiased;
-  transition: background-color var(--transition-base), color var(--transition-base);
+  transition:
+    background-color var(--transition-base),
+    color var(--transition-base);
 }
 
 a {
