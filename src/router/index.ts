@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import ShowDetailView from '@/views/ShowDetailView.vue'
-import SearchResultsView from '@/views/SearchResultsView.vue'
-import NotFoundView from '@/views/NotFoundView.vue'
 
+// to keep initial bundle small, used lazy imports for the other views.
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -15,17 +13,17 @@ const router = createRouter({
     {
       path: '/search',
       name: 'search',
-      component: SearchResultsView,
+      component: () => import('@/views/SearchResultsView.vue'),
     },
     {
       path: '/show/:id(\\d+)',
       name: 'show-detail',
-      component: ShowDetailView,
+      component: () => import('@/views/ShowDetailView.vue'),
     },
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: NotFoundView,
+      component: () => import('@/views/NotFoundView.vue'),
     },
   ],
 })

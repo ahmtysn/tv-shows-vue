@@ -2,11 +2,14 @@
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSearchStore } from '@/stores/search'
+import { useTitle } from '@/composables/useTitle'
 import ShowCard from '@/components/ShowCard.vue'
 import ErrorBox from '@/components/ErrorBox.vue'
 
 const route = useRoute()
 const searchStore = useSearchStore()
+
+useTitle(() => (searchStore.query ? `Search: ${searchStore.query}` : 'Search'))
 
 onMounted(() => {
   const q = (route.query.q as string) ?? ''

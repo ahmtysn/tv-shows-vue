@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { fetchShowById } from '@/services/tvmaze'
 import { useAsyncData } from '@/composables/useAsyncData'
+import { useTitle } from '@/composables/useTitle'
 import ErrorBox from '@/components/ErrorBox.vue'
 import CastCard from '@/components/CastCard.vue'
 
@@ -10,6 +11,8 @@ const route = useRoute()
 const router = useRouter()
 
 const { data: show, isLoading, error, execute } = useAsyncData(fetchShowById)
+
+useTitle(() => show.value?.name)
 
 const cast = computed(() => show.value?._embedded?.cast ?? [])
 
@@ -75,10 +78,7 @@ function goBack() {
           <div v-if="show.genres?.length" class="detail__genres">
             <span v-for="genre in show.genres" :key="genre" class="genre-chip">{{ genre }}</span>
           </div>
-
-          <div v-if="sanitizedSummary" class="detail__summary" v-html="sanitizedSummary" />
           <div v-if="show.summary" class="detail__summary" v-html="show.summary" />
-
           <div v-if="show.network || show.schedule?.days?.length" class="detail__info">
             <template v-if="show.network">
               <span class="info-label">Network</span>

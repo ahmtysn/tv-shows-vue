@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { useTitle } from '@/composables/useTitle'
+
+useTitle('Page not found')
+</script>
+
 <template>
   <div class="not-found">
     <h1 class="not-found__code">404</h1>

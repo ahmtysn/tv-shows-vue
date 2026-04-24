@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useShowsStore } from '@/stores/shows'
+import { useTitle } from '@/composables/useTitle'
 import ShowCard from '@/components/ShowCard.vue'
 import GenreRow from '@/components/GenreRow.vue'
 import SkeletonCard from '@/components/SkeletonCard.vue'
@@ -10,6 +11,8 @@ const SKELETON_ROWS = 4
 const SKELETON_CARDS_PER_ROW = 8
 
 const store = useShowsStore()
+
+useTitle('Dashboard')
 
 onMounted(() => {
   store.loadShows()
