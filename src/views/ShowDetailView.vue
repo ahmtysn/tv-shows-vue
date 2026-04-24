@@ -1,35 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { ShowWithCast } from '@/types/show'
 import { fetchShowById } from '@/services/tvmaze'
+import { useAsyncData } from '@/composables/useAsyncData'
 import ErrorBox from '@/components/ErrorBox.vue'
 import CastCard from '@/components/CastCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const show = ref<ShowWithCast | null>(null)
-const isLoading = ref(true)
-const error = ref<string | null>(null)
+const { data: show, isLoading, error, execute } = useAsyncData(fetchShowById)
 
 const cast = computed(() => show.value?._embedded?.cast ?? [])
 
 const SKELETON_TAG_COUNT = 5
 const SKELETON_TEXT_LINES = 4
 
-async function loadShow() {
-  isLoading.value = true
-  error.value = null
-
-  try {
-    const id = Number(route.params.id)
-    show.value = await fetchShowById(id)
-  } catch (e) {
-    error.value = e instanceof Error ? e.message : 'Failed to load show'
-  } finally {
-    isLoading.value = false
-  }
+function loadShow() {
+  return execute(Number(route.params.id))
 }
 
 onMounted(loadShow)

@@ -2,33 +2,31 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { Show } from '@/types/show'
 import { searchShows } from '@/services/tvmaze'
+import { useAsyncData } from '@/composables/useAsyncData'
 
 export const useSearchStore = defineStore('search', () => {
   const query = ref('')
-  const results = ref<Show[]>([])
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
+
+  const {
+    data: results,
+    isLoading,
+    error,
+    execute,
+  } = useAsyncData(async (term: string): Promise<Show[]> => {
+    const data = await searchShows(term)
+    return data.map((item) => item.show)
+  }, [] as Show[])
 
   async function search(term: string) {
     query.value = term
-    error.value = null
 
     if (!term.trim()) {
       results.value = []
+      error.value = null
       return
     }
 
-    isLoading.value = true
-
-    try {
-      const data = await searchShows(term)
-      results.value = data.map((item) => item.show)
-    } catch {
-      results.value = []
-      error.value = 'Search failed. Please try again.'
-    } finally {
-      isLoading.value = false
-    }
+    await execute(term)
   }
 
   function clear() {
