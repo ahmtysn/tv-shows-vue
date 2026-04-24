@@ -42,7 +42,7 @@ onUnmounted(() => {
       </svg>
     </button>
 
-    <div ref="row" class="genre-row">
+    <div ref="row" class="genre-row" tabindex="0" role="list" aria-label="Show list">
       <slot />
     </div>
 

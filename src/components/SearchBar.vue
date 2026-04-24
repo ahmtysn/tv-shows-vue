@@ -18,19 +18,20 @@ function onClear() {
 </script>
 
 <template>
-  <div class="search-bar">
-    <svg class="search-bar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <search class="search-bar" role="search" aria-label="Search TV shows">
+    <svg class="search-bar__icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.35-4.35" />
     </svg>
     <input
       v-model="input"
-      type="text"
+      type="search"
       placeholder="Search TV shows..."
       class="search-bar__input"
+      aria-label="Search TV shows"
     />
-    <button v-if="input" class="search-bar__clear" @click="onClear">✕</button>
-  </div>
+    <button v-if="input" class="search-bar__clear" aria-label="Clear search" @click="onClear">✕</button>
+  </search>
 </template>
 
 <style scoped>

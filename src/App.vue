@@ -4,16 +4,17 @@ import SearchBar from '@/components/SearchBar.vue'
 
 <template>
   <div class="app">
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <header class="app-header">
-      <div class="app-header__inner">
+      <nav class="app-header__inner" aria-label="Main navigation">
         <RouterLink to="/" class="app-header__brand">
-          <span class="app-header__logo">TV</span>
+          <span class="app-header__logo" aria-hidden="true">TV</span>
           <span class="app-header__title">ShowHub</span>
         </RouterLink>
         <SearchBar />
-      </div>
+      </nav>
     </header>
-    <main class="app-main">
+    <main id="main-content" class="app-main">
       <router-view />
     </main>
   </div>
@@ -38,6 +39,27 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid #ffc107;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  background: #ffc107;
+  color: #000;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  z-index: 200;
+  border-radius: 0 0 6px 0;
+}
+
+.skip-link:focus {
+  top: 0;
 }
 </style>
 

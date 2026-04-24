@@ -21,7 +21,7 @@ onMounted(() => {
   <div>
     <!-- Search results -->
     <template v-if="searchStore.query">
-      <p v-if="searchStore.isLoading" class="status">Searching...</p>
+      <p v-if="searchStore.isLoading" class="status" role="status" aria-live="polite">Searching...</p>
       <template v-else>
         <h2 class="section-title">Results for "{{ searchStore.query }}"</h2>
         <div class="search-results">
@@ -45,7 +45,7 @@ onMounted(() => {
           </GenreRow>
         </section>
       </template>
-      <p v-else-if="store.error" class="status status--error">{{ store.error }}</p>
+      <p v-else-if="store.error" class="status status--error" role="alert">{{ store.error }}</p>
 
       <template v-else>
         <section v-for="genre in store.genres" :key="genre" class="genre-section">
